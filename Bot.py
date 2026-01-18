@@ -28,8 +28,8 @@ def vpn_topla():
         except:
             continue
             
-    # Sonuçları abonelik.txt dosyasına yaz
-    with open("abonelik.txt", "w") as f:
+    # Sonuçları abone.txt dosyasına yaz
+    with open("abone.txt", "w") as f:
         f.write("\n".join(butun_keyler))
     
     print(f"Bitti! {len(butun_keyler)} tane VPN bulundu.")
