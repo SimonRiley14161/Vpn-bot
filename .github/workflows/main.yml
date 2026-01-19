@@ -29,7 +29,8 @@ jobs:
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
+          git pull --rebase origin main
           git add abone.txt
           git commit -m "VPN Listesi Guncellendi" || exit 0
-          git push
+          git push origin main --force
           
