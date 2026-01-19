@@ -1,7 +1,6 @@
 import requests
 import re
 
-# SENİN KANALLARIN
 URLS = [
     "https://tmstart.me/serverstm7",
     "https://tmstart.me/Kanal45",
@@ -15,24 +14,21 @@ URLS = [
 
 def vpn_topla():
     butun_keyler = set()
+    headers = {'User-Agent': 'Mozilla/5.0'}
     
     for url in URLS:
         try:
-            # Sayfayı indir
-            r = requests.get(url, timeout=10)
+            r = requests.get(url, headers=headers, timeout=15)
             if r.status_code == 200:
-                # vless, vmess, ss ve trojan kodlarını ayıkla
                 bulunanlar = re.findall(r'(?:vless|vmess|ss|trojan)://[^\s<>"]+', r.text)
-                for k in bulunanlar:
-                    butun_keyler.add(k)
+                butun_keyler.update(bulunanlar)
         except:
             continue
             
-    # Sonuçları abone.txt dosyasına yaz
-    with open("abone.txt", "w") as f:
-        f.write("\n".join(butun_keyler))
+    with open("abone.txt", "w", encoding="utf-8") as f:
+        f.write("\n".join(list(butun_keyler)))
     
-    print(f"Bitti! {len(butun_keyler)} tane VPN bulundu.")
+    print(f"Islem Tamam: {len(butun_keyler)} config bulundu.")
 
 if __name__ == "__main__":
     vpn_topla()
