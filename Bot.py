@@ -1,9 +1,9 @@
 import requests
 import re
 
-# Tarayıcı gibi görünmek için "User-Agent" ekledik
-HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
 
+# Senin seçtiğin o 8 kanal (Web arayüzü üzerinden tarayacağız)
 URLS = [
     "https://tmstart.me/serverstm7",
     "https://tmstart.me/Kanal45",
@@ -15,35 +15,37 @@ URLS = [
     "https://tmstart.me/VPNShield"
 ]
 
-def vpn_topla():
-    butun_keyler = set()
-    print("Operasyon basladi...")
+def vpn_supur():
+    butun_bulunanlar = set()
+    print("Süpürme operasyonu başladı...")
     
     for url in URLS:
         try:
-            # Zaman asimini 20 saniyeye cikardik ve HEADERS ekledik
-            r = requests.get(url, headers=HEADERS, timeout=20)
+            # Kanala gidip tüm metni çekiyoruz
+            r = requests.get(url, headers=HEADERS, timeout=15)
             if r.status_code == 200:
-                # Daha kapsamli bir arama yapalim
-                bulunanlar = re.findall(r'(?:vless|vmess|ss|trojan)://[^\s<>"]+', r.text)
-                if bulunanlar:
-                    print(f"Buldum: {url} -> {len(bulunanlar)} adet")
-                    butun_keyler.update(bulunanlar)
+                # Regex ile vless, vmess, ss, trojan ne varsa ayıklıyoruz
+                pattern = r'(?:vless|vmess|ss|trojan)://[^\s<>"]+'
+                linkler = re.findall(pattern, r.text)
+                
+                if linkler:
+                    print(f"Buldum! {url} -> {len(linkler)} tane.")
+                    butun_bulunanlar.update(linkler)
                 else:
-                    print(f"Bos: {url}")
-            else:
-                print(f"Hata Kodu {r.status_code}: {url}")
+                    print(f"İçerik yok: {url}")
         except Exception as e:
-            print(f"Baglanti Hatasi: {url} -> {e}")
-            
-    # Sonucu dosyaya zorla yazdiriyoruz
-    if butun_keyler:
+            print(f"Bağlantı sorunu: {url} -> {e}")
+
+    # Eğer 1 tane bile bir şey bulduysan dosyaya yaz
+    if butun_bulunanlar:
         with open("abone.txt", "w", encoding="utf-8") as f:
-            f.write("\n".join(list(butun_keyler)))
-        print(f"Basarili! Toplam {len(butun_keyler)} config kaydedildi.")
+            f.write("\n".join(list(butun_supur))) # Set'i listeye çevirip alt alta yaz
+        print(f"Tamamdır! Toplam {len(butun_bulunanlar)} config ile abone.txt dolduruldu.")
     else:
-        print("Hic config bulunamadi, dosya guncellenmedi.")
+        # Eğer hiçbir şey bulamazsa dosyayı silme, içine hata yaz ki anlayalım
+        with open("abone.txt", "w", encoding="utf-8") as f:
+            f.write("BOT CALISTI AMA LINK BULAMADI. KANALLARI KONTROL ET.")
 
 if __name__ == "__main__":
-    vpn_topla()
+    vpn_supur()
         
