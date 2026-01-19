@@ -1,27 +1,35 @@
 name: VPN_Guncelle
+
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '0 * * * *' # Her saat başı otomatik çalışır
-  workflow_dispatch: # İstediğinde elle çalıştırmak için buton ekler
+    - cron: '0 */3 * * *'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v3
-      - name: Python Ayarla
+      - name: Depoyu Kontrol Et
+        uses: actions/checkout@v3
+
+      - name: Python Kur
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+
+      - name: Gereksinimleri Kur
+        run: pip install requests
+
       - name: Botu Calistir
+        run: python Bot.py
+
+      - name: Degisiklikleri Kaydet
         run: |
-          pip install requests
-          python Bot.py
-      - name: Kaydet ve Yukle
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add abonelik.txt
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add abone.txt
           git commit -m "VPN Listesi Guncellendi" || exit 0
           git push
           
