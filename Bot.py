@@ -1,51 +1,43 @@
 import requests
 import re
+from datetime import datetime
 
-# Start Messenger'ın web servisi bazen botlara karşı hassas olabilir, o yüzden sağlam bir kafa (headers) takıyoruz.
+# Hedef kanal ve ayarlar
+TARGET_URL = "https://t.me/s/Vipper_v2ray"
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
 
-# Senin Start Messenger kanallarının asıl linkleri
-URLS = [
-    "https://tmstart.me/serverstm7",
-    "https://tmstart.me/Kanal45",
-    "https://tmstart.me/Kanal91",
-    "https://tmstart.me/kanal67",
-    "https://tmstart.me/swech_servers",
-    "https://tmstart.me/kaktus",
-    "https://tmstart.me/OctoS",
-    "https://tmstart.me/VPNShield"
-]
+def son_gun_avi():
+    bulunan_kodlar = []
+    print(f"{TARGET_URL} taranıyor... Sandman için son operasyon.")
 
-def start_messenger_avi():
-    bulunan_kodlar = set()
-    print("Start Messenger kanalları taranıyor...")
-
-    for url in URLS:
-        try:
-            # Botu doğrudan bu kanalın web sayfasına gönderiyoruz
-            r = requests.get(url, headers=HEADERS, timeout=20)
-            if r.status_code == 200:
-                # Kanaldaki vless, vmess, ss gibi kodları ayıklıyoruz
-                pattern = r'(?:vless|vmess|ss|trojan)://[^\s<>"]+'
-                bulunanlar = re.findall(pattern, r.text)
-                
-                if bulunanlar:
-                    print(f"Buldum! {url} adresinden {len(bulunanlar)} config çekildi.")
-                    bulunan_kodlar.update(bulunanlar)
-                else:
-                    print(f"Kod bulunamadı: {url}")
-        except Exception as e:
-            print(f"Bağlantı kesildi: {url} -> {e}")
-
-    # Sonucu dosyaya yazıyoruz
-    if bulunan_kodlar:
-        with open("abone.txt", "w", encoding="utf-8") as f:
-            f.write("\n".join(list(bulunan_kodlar)))
-        print(f"Operasyon Tamam! {len(bulunan_kodlar)} adet VPN kodu kaydedildi.")
-    else:
-        with open("abone.txt", "w", encoding="utf-8") as f:
-            f.write("SISTEM BAGLANDI: Start Messenger kanalinda su an yeni kod yok.")
+    try:
+        r = requests.get(TARGET_URL, headers=HEADERS, timeout=20)
+        if r.status_code == 200:
+            # Telegram'ın web görünümündeki her bir mesaj bloğunu ayırıyoruz
+            mesajlar = re.findall(r'<div class="tgme_widget_message_text[^>]*>(.*?)</div>', r.text, re.DOTALL)
+            
+            for mesaj in mesajlar:
+                # vless, vmess, ss, trojan kodlarını ara
+                linkler = re.findall(r'(?:vless|vmess|ss|trojan)://[^\s<>"]+', mesaj)
+                if linkler:
+                    bulunan_kodlar.extend(linkler)
+            
+            # Tekrar edenleri temizle
+            bulunan_kodlar = list(set(bulunan_kodlar))
+            
+            if bulunan_kodlar:
+                with open("abone.txt", "w", encoding="utf-8") as f:
+                    f.write("\n".join(bulunan_kodlar))
+                print(f"Başarılı! {len(bulunan_kodlar)} adet taze config toplandı.")
+            else:
+                print("Maalesef, son mesajlarda uygun formatta kod bulunamadı.")
+                with open("abone.txt", "w", encoding="utf-8") as f:
+                    f.write("Sandman: Kanalda son 1 gün içinde config bulunamadı.")
+        else:
+            print(f"Kanala erişilemedi. Hata kodu: {r.status_code}")
+    except Exception as e:
+        print(f"Bir hata oluştu: {e}")
 
 if __name__ == "__main__":
-    start_messenger_avi()
-    
+    son_gun_avi()
+            
