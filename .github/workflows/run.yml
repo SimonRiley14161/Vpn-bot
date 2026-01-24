@@ -1,0 +1,30 @@
+name: VPN Factory
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python kurulumu
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Scripti çalıştır
+        run: |
+          pip install requests
+          python bot.py
+
+      - name: sub.txt kaydet
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add sub.txt
+          git commit -m "update sub" || echo "no change"
+          git push
