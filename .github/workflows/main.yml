@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write  # Bu satır bota 'yazabilirsin' emri verir
     steps:
       - name: Depoyu Kontrol Et
         uses: actions/checkout@v3
@@ -27,10 +27,8 @@ jobs:
 
       - name: Degisiklikleri Kaydet
         run: |
-          git config --global user.name 'GitHub Action'
-          git config --global user.email 'action@github.com'
-          git pull --rebase origin main
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add abone.txt
-          git commit -m "VPN Listesi Guncellendi" || exit 0
-          git push origin main --force
-          
+          git commit -m "VPN Listesi Guncellendi" || echo "Degisiklik yok"
+          git push origin ana --force
